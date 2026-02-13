@@ -4,22 +4,36 @@ import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.decision.RuleViolation;
 import com.example.travel_planner.domain.trip.Trip;
 
-public class FoodCostRule {
+import java.util.Optional;
+
+public class FoodCostRule implements Rule {
+
     private static final double MIN_COST_PER_DAY = 300;
 
-    public RuleViolation check(Trip trip, Money foodCost) {
+    private final Trip trip;
+    private final Money foodCost;
+
+    public FoodCostRule(Trip trip, Money foodCost) {
+        this.trip = trip;
+        this.foodCost = foodCost;
+    }
+
+    @Override
+    public Optional<RuleViolation> check() {
 
         double costPerDayPerTraveler =
                 foodCost.getAmount() /
                         (trip.getNumberOfDays() * trip.getNumberOfTravelers());
 
         if (costPerDayPerTraveler < MIN_COST_PER_DAY) {
-            return new RuleViolation(
-                    "MIN_FOOD_COST",
-                    "Food cost per day per traveler is too low"
+            return Optional.of(
+                    new RuleViolation(
+                            "MIN_FOOD_COST",
+                            "Food cost per day per traveler is too low"
+                    )
             );
         }
 
-        return null; // no violation
+        return Optional.empty();
     }
 }
