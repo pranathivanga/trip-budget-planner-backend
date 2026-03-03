@@ -4,6 +4,7 @@ import com.example.travel_planner.domain.budget.Budget;
 import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.decision.FeasibilityResult;
 import com.example.travel_planner.domain.trip.Location;
+import com.example.travel_planner.domain.trip.StayPreference;
 import com.example.travel_planner.domain.trip.Trip;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,9 @@ class TripBudgetIntegrationTest {
                 new Location("Hyderabad"),
                 new Location("Goa"),
                 3,
-                2
+                2,
+                StayPreference.STANDARD
+
         );
 
         // 2. Individual cost calculations
@@ -34,9 +37,9 @@ class TripBudgetIntegrationTest {
 
         // 3. Category-based Budget
         Budget budget = new Budget(
-                new Money(5000, "INR"),    // travel budget
-                new Money(10000, "INR"),   // stay budget
-                new Money(5000, "INR")     // food budget
+                new Money(20000, "INR"),    // travel budget
+                new Money(30000, "INR"),   // stay budget
+                new Money(10000, "INR")     // food budget
         );
 
         // 4. Feasibility decision

@@ -2,6 +2,7 @@ package com.example.travel_planner.service;
 
 import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.trip.Location;
+import com.example.travel_planner.domain.trip.StayPreference;
 import com.example.travel_planner.domain.trip.Trip;
 import org.junit.jupiter.api.Test;
 
@@ -15,13 +16,15 @@ public class StayCostCalculatorTest {
                 new Location("Hyderabad"),
                 new Location("Goa"),
                 4,
-                2
+                2,
+                StayPreference.STANDARD
+
         );
 
         StayCostCalculator calculator = new StayCostCalculator();
 
         Money cost = calculator.calculate(trip);
 
-        assertEquals(12000, cost.getAmount());
+        assertEquals(28800, cost.getAmount());
     }
 }
