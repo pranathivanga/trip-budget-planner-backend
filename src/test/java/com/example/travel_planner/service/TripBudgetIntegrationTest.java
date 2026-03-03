@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TripBudgetIntegrationTest {
+class TripBudgetIntegrationTest {
+
     @Test
     void shouldDetermineTripAsFeasibleWithinBudget() {
 
@@ -22,22 +23,42 @@ public class TripBudgetIntegrationTest {
                 2
         );
 
-        // 2. Calculate total cost
-        TotalCostCalculator totalCostCalculator = new TotalCostCalculator();
-        Money totalCost = totalCostCalculator.calculateTotalCost(trip);
+        // 2. Individual cost calculations
+        TravelCostCalculator travelCalc = new TravelCostCalculator();
+        StayCostCalculator stayCalc = new StayCostCalculator();
+        FoodCostCalculator foodCalc = new FoodCostCalculator();
 
-        // 3. Budget
-        Budget budget = new Budget(new Money(25000, "INR"));
+        Money travelCost = travelCalc.calculate(trip);
+        Money stayCost = stayCalc.calculate(trip);
+        Money foodCost = foodCalc.calculate(trip);
+
+        // 3. Category-based Budget
+        Budget budget = new Budget(
+                new Money(5000, "INR"),    // travel budget
+                new Money(10000, "INR"),   // stay budget
+                new Money(5000, "INR")     // food budget
+        );
 
         // 4. Feasibility decision
         BudgetFeasibilityService feasibilityService =
                 new BudgetFeasibilityService();
 
         FeasibilityResult result =
-                feasibilityService.evaluate(budget, totalCost);
+                feasibilityService.evaluate(
+                        budget,
+                        travelCost,
+                        stayCost,
+                        foodCost
+                );
 
-        // 5. Assertions (final truth)
+        // 5. Assertions
         assertTrue(result.isFeasible());
-        assertEquals(16000, result.getTotalCost().getAmount());
+
+        double expectedTotal =
+                travelCost.getAmount()
+                        + stayCost.getAmount()
+                        + foodCost.getAmount();
+
+        assertEquals(expectedTotal, result.getTotalCost().getAmount());
     }
 }

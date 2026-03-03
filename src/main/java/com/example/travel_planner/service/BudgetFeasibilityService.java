@@ -5,27 +5,47 @@ import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.decision.FeasibilityResult;
 import com.example.travel_planner.domain.decision.RuleViolation;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BudgetFeasibilityService {
 
-    public FeasibilityResult evaluate(Budget budget, Money totalCost) {
+    public FeasibilityResult evaluate(Budget budget,
+                                      Money travelCost,
+                                      Money stayCost,
+                                      Money foodCost) {
 
-        double remaining =
-                budget.getTotalBudget().getAmount() - totalCost.getAmount();
+        List<RuleViolation> violations = new ArrayList<>();
 
-        boolean feasible = remaining >= 0;
+        CategoryBudgetRule rule = new CategoryBudgetRule();
 
-        Money remainingBudget = new Money(remaining, "INR");
+        RuleViolation travelViolation =
+                rule.check("travel", travelCost, budget.getTravelBudget());
 
-        // 🔹 No rules applied yet → empty violations list
-        List<RuleViolation> violations = Collections.emptyList();
+        RuleViolation stayViolation =
+                rule.check("stay", stayCost, budget.getStayBudget());
+
+        RuleViolation foodViolation =
+                rule.check("food", foodCost, budget.getFoodBudget());
+
+        if (travelViolation != null) violations.add(travelViolation);
+        if (stayViolation != null) violations.add(stayViolation);
+        if (foodViolation != null) violations.add(foodViolation);
+
+        boolean feasible = violations.isEmpty();
+
+        // Remaining budget is optional now — keeping simple
+        Money dummyRemaining = new Money(0, "INR");
 
         return new FeasibilityResult(
                 feasible,
-                totalCost,
-                remainingBudget,
+                new Money(
+                        travelCost.getAmount()
+                                + stayCost.getAmount()
+                                + foodCost.getAmount(),
+                        "INR"
+                ),
+                dummyRemaining,
                 violations
         );
     }
