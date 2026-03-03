@@ -1,8 +1,8 @@
 package com.example.travel_planner.service;
 
+import com.example.travel_planner.domain.trip.Trip;
 import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.decision.RuleViolation;
-import com.example.travel_planner.domain.trip.Trip;
 
 import java.util.Optional;
 

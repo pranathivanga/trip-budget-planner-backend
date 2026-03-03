@@ -1,3 +1,5 @@
+
+
 package com.example.travel_planner.service;
 
 import com.example.travel_planner.domain.decision.RuleViolation;

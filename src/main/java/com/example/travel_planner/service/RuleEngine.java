@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RuleEngine {
+
     public List<RuleViolation> evaluate(List<Rule> rules) {
 
         List<RuleViolation> violations = new ArrayList<>();
