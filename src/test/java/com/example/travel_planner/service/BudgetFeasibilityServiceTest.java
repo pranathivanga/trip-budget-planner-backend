@@ -2,11 +2,11 @@ package com.example.travel_planner.service;
 
 import com.example.travel_planner.domain.budget.Budget;
 import com.example.travel_planner.domain.cost.Money;
+import com.example.travel_planner.domain.decision.BudgetState;
 import com.example.travel_planner.domain.decision.FeasibilityResult;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BudgetFeasibilityServiceTest {
 
@@ -50,5 +50,6 @@ class BudgetFeasibilityServiceTest {
                 service.evaluate(budget, travelCost, stayCost, foodCost);
 
         assertFalse(result.isFeasible());
+        assertEquals(BudgetState.NOT_FEASIBLE, result.getBudgetState());
     }
 }

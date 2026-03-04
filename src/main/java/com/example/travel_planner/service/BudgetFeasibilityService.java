@@ -2,6 +2,7 @@ package com.example.travel_planner.service;
 
 import com.example.travel_planner.domain.budget.Budget;
 import com.example.travel_planner.domain.cost.Money;
+import com.example.travel_planner.domain.decision.BudgetState;
 import com.example.travel_planner.domain.decision.FeasibilityResult;
 import com.example.travel_planner.domain.decision.RuleViolation;
 
@@ -32,11 +33,40 @@ public class BudgetFeasibilityService {
                 "INR"
         );
 
+        double totalBudget =
+                budget.getTravelBudget().getAmount()
+                        + budget.getStayBudget().getAmount()
+                        + budget.getFoodBudget().getAmount();
+
+        double totalCostAmount =
+                travelCost.getAmount()
+                        + stayCost.getAmount()
+                        + foodCost.getAmount();
+
+        double remaining = totalBudget - totalCostAmount;
+
+        BudgetState state;
+
+        if (!violations.isEmpty()) {
+            state = BudgetState.NOT_FEASIBLE;
+        } else {
+            double ratio = remaining / totalBudget;
+
+            if (ratio <= 0.05) {
+                state = BudgetState.TIGHT;
+            } else if (ratio <= 0.25) {
+                state = BudgetState.COMFORTABLE;
+            } else {
+                state = BudgetState.LUXURY_POSSIBLE;
+            }
+        }
+
         return new FeasibilityResult(
-                feasible,
-                totalCost,
-                new Money(0, "INR"),
-                violations
+                violations.isEmpty(),
+                new Money(totalCostAmount, "INR"),
+                new Money(remaining, "INR"),
+                violations,
+                state
         );
     }
 }

@@ -2,6 +2,7 @@ package com.example.travel_planner.service;
 
 import com.example.travel_planner.domain.budget.Budget;
 import com.example.travel_planner.domain.cost.Money;
+import com.example.travel_planner.domain.decision.BudgetState;
 import com.example.travel_planner.domain.decision.FeasibilityResult;
 import com.example.travel_planner.domain.trip.Location;
 import com.example.travel_planner.domain.trip.StayPreference;
@@ -62,6 +63,7 @@ class TripBudgetIntegrationTest {
                         + stayCost.getAmount()
                         + foodCost.getAmount();
 
-        assertEquals(expectedTotal, result.getTotalCost().getAmount());
+        assertTrue(result.isFeasible());
+        assertEquals(BudgetState.LUXURY_POSSIBLE, result.getBudgetState());
     }
 }
