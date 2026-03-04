@@ -114,11 +114,13 @@ public class ItineraryGenerator {
                 "INR"
         );
 
+        int finalDays = baseTrip.getNumberOfDays();
+
         String explanation =
                 "Generated " + type +
                         " plan using stay preference " + usedPreference +
-                        " for " + baseTrip.getNumberOfDays() + " days";
-        
+                        " for " + finalDays + " days";
+
         return new TripPlan(type, totalCost, result, explanation);
     }
     private StayPreference downgrade(StayPreference current) {
