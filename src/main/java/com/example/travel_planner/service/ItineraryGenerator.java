@@ -49,6 +49,34 @@ public class ItineraryGenerator {
         FeasibilityResult result =
                 feasibilityService.evaluate(budget, travelCost, stayCost, foodCost);
 
+        StayPreference usedPreference = preference;
+
+        if (!result.isFeasible()) {
+
+            StayPreference downgraded = downgrade(preference);
+
+            if (downgraded != preference) {
+
+                Trip cheaperTrip = new Trip(
+                        baseTrip.getSource(),
+                        baseTrip.getDestination(),
+                        baseTrip.getNumberOfDays(),
+                        baseTrip.getNumberOfTravelers(),
+                        downgraded
+                );
+
+                stayCost = stayCostCalculator.calculate(cheaperTrip);
+
+                result = feasibilityService.evaluate(
+                        budget,
+                        travelCost,
+                        stayCost,
+                        foodCost
+                );
+
+                usedPreference = downgraded;
+            }
+        }
         Money totalCost = new Money(
                 travelCost.getAmount()
                         + stayCost.getAmount()
@@ -57,8 +85,21 @@ public class ItineraryGenerator {
         );
 
         String explanation =
-                "Generated " + type + " plan using stay preference " + preference;
-
+                "Generated " + type +
+                        " plan using stay preference " + usedPreference;
+        
         return new TripPlan(type, totalCost, result, explanation);
+    }
+    private StayPreference downgrade(StayPreference current) {
+
+        if (current == StayPreference.PREMIUM) {
+            return StayPreference.STANDARD;
+        }
+
+        if (current == StayPreference.STANDARD) {
+            return StayPreference.BUDGET;
+        }
+
+        return StayPreference.BUDGET;
     }
 }
