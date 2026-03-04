@@ -28,7 +28,12 @@ public class ItineraryGenerator {
 
         return plans;
     }
-
+    private int reduceDays(int currentDays) {
+        if (currentDays > 1) {
+            return currentDays - 1;
+        }
+        return 1;
+    }
     private TripPlan createPlan(Trip baseTrip,
                                 Budget budget,
                                 StayPreference preference,
@@ -52,7 +57,32 @@ public class ItineraryGenerator {
         StayPreference usedPreference = preference;
 
         if (!result.isFeasible()) {
+            if (!result.isFeasible()) {
 
+                int reducedDays = reduceDays(baseTrip.getNumberOfDays());
+
+                if (reducedDays < baseTrip.getNumberOfDays()) {
+
+                    Trip shorterTrip = new Trip(
+                            baseTrip.getSource(),
+                            baseTrip.getDestination(),
+                            reducedDays,
+                            baseTrip.getNumberOfTravelers(),
+                            usedPreference
+                    );
+
+                    travelCost = travelCostCalculator.calculate(shorterTrip);
+                    stayCost = stayCostCalculator.calculate(shorterTrip);
+                    foodCost = foodCostCalculator.calculate(shorterTrip);
+
+                    result = feasibilityService.evaluate(
+                            budget,
+                            travelCost,
+                            stayCost,
+                            foodCost
+                    );
+                }
+            }
             StayPreference downgraded = downgrade(preference);
 
             if (downgraded != preference) {
@@ -86,7 +116,8 @@ public class ItineraryGenerator {
 
         String explanation =
                 "Generated " + type +
-                        " plan using stay preference " + usedPreference;
+                        " plan using stay preference " + usedPreference +
+                        " for " + baseTrip.getNumberOfDays() + " days";
         
         return new TripPlan(type, totalCost, result, explanation);
     }
