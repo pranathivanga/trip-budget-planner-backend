@@ -38,4 +38,13 @@ public class TripRequest {
     public void setTravelers(int travelers) {
         this.travelers = travelers;
     }
+    private double totalBudget;
+
+    public double getTotalBudget() {
+        return totalBudget;
+    }
+
+    public void setTotalBudget(double totalBudget) {
+        this.totalBudget = totalBudget;
+    }
 }

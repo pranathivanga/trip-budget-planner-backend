@@ -6,14 +6,17 @@ import com.example.travel_planner.domain.trip.StayPreference;
 import com.example.travel_planner.domain.trip.Trip;
 import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.decision.FeasibilityResult;
-import com.example.travel_planner.domain.budget.Budget;
+import com.example.travel_planner.service.budget.Budget;
+import com.example.travel_planner.config.PlannerConfig;
+import com.example.travel_planner.service.distance.DistanceService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ItineraryGenerator {
-
-    private final TravelCostCalculator travelCostCalculator = new TravelCostCalculator();
+    private final PlannerConfig config = new PlannerConfig();
+    private final TravelCostCalculator travelCostCalculator =
+            new TravelCostCalculator(new PlannerConfig(), new DistanceService());
     private final StayCostCalculator stayCostCalculator = new StayCostCalculator();
     private final FoodCostCalculator foodCostCalculator = new FoodCostCalculator();
     private final BudgetFeasibilityService feasibilityService = new BudgetFeasibilityService();
@@ -121,7 +124,17 @@ public class ItineraryGenerator {
                         " plan using stay preference " + usedPreference +
                         " for " + finalDays + " days";
 
-        return new TripPlan(type, totalCost, result, explanation);
+        TripPlan plan = new TripPlan(
+                type,
+                travelCost,
+                stayCost,
+                foodCost,
+                totalCost,
+                result.getBudgetState(),
+                explanation
+        );
+
+        return plan;
     }
     private StayPreference downgrade(StayPreference current) {
 

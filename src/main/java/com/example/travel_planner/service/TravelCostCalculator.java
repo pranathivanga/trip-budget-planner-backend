@@ -1,25 +1,34 @@
 package com.example.travel_planner.service;
 
-import com.example.travel_planner.domain.trip.Trip;
+import com.example.travel_planner.config.PlannerConfig;
 import com.example.travel_planner.domain.cost.Money;
+import com.example.travel_planner.domain.trip.Trip;
+import com.example.travel_planner.service.distance.DistanceService;
 
 public class TravelCostCalculator {
 
-    private static final double COST_PER_KM = 5.0;
+    private final PlannerConfig config;
+    private final DistanceService distanceService;
 
-    private final DistanceCalculator distanceCalculator = new DistanceCalculator();
+    public TravelCostCalculator(PlannerConfig config, DistanceService distanceService) {
+        this.config = config;
+        this.distanceService = distanceService;
+    }
 
     public Money calculate(Trip trip) {
 
-        int distance = distanceCalculator.calculateDistance(
-                trip.getSource().getCity(),
-                trip.getDestination().getCity()
-        );
+        String source = trip.getSource().getCity();
+        String destination = trip.getDestination().getCity();
 
-        double total = distance
-                * COST_PER_KM
-                * trip.getNumberOfTravelers();
+        int distance = distanceService.getDistance(source, destination);
 
-        return new Money(total, "INR");
+        double costPerKm = 5;
+
+        double travelCost =
+                distance *
+                        costPerKm *
+                        trip.getNumberOfTravelers();
+
+        return new Money(travelCost, "INR");
     }
 }

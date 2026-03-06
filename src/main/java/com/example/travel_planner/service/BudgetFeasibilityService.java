@@ -1,6 +1,6 @@
 package com.example.travel_planner.service;
 
-import com.example.travel_planner.domain.budget.Budget;
+import com.example.travel_planner.service.budget.Budget;
 import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.decision.BudgetState;
 import com.example.travel_planner.domain.decision.FeasibilityResult;
@@ -16,9 +16,8 @@ public class BudgetFeasibilityService {
                                       Money foodCost) {
 
         List<Rule> rules = List.of(
-                new TravelBudgetRule(travelCost, budget.getTravelBudget()),
-                new StayBudgetRule(stayCost, budget.getStayBudget()),
-                new FoodBudgetRule(foodCost, budget.getFoodBudget())
+
+                new FoodBudgetRule(foodCost, budget.getTotalBudget())
         );
 
         RuleEngine engine = new RuleEngine();

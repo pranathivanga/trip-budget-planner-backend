@@ -1,35 +1,62 @@
 package com.example.travel_planner.domain.plan;
 
 import com.example.travel_planner.domain.cost.Money;
-import com.example.travel_planner.domain.decision.FeasibilityResult;
+import com.example.travel_planner.domain.decision.BudgetState;
 
 public class TripPlan {
 
-    private final PlanType type;
+    private final PlanType planType;
+
+    private final Money travelCost;
+    private final Money stayCost;
+    private final Money foodCost;
+
     private final Money totalCost;
-    private final FeasibilityResult feasibility;
+
+    private final BudgetState budgetState;
+
     private final String explanation;
 
-    public TripPlan(PlanType type,
-                    Money totalCost,
-                    FeasibilityResult feasibility,
-                    String explanation) {
-        this.type = type;
+    public TripPlan(
+            PlanType planType,
+            Money travelCost,
+            Money stayCost,
+            Money foodCost,
+            Money totalCost,
+            BudgetState budgetState,
+            String explanation
+    ) {
+        this.planType = planType;
+        this.travelCost = travelCost;
+        this.stayCost = stayCost;
+        this.foodCost = foodCost;
         this.totalCost = totalCost;
-        this.feasibility = feasibility;
+        this.budgetState = budgetState;
         this.explanation = explanation;
     }
 
-    public PlanType getType() {
-        return type;
+    public PlanType getPlanType() {
+        return planType;
+    }
+
+    public Money getTravelCost() {
+        return travelCost;
+    }
+
+    public Money getStayCost() {
+        return stayCost;
+    }
+
+    public Money getFoodCost() {
+        return foodCost;
     }
 
     public Money getTotalCost() {
         return totalCost;
     }
 
-    public FeasibilityResult getFeasibility() {
-        return feasibility;
+    public BudgetState getBudgetState() {
+        return budgetState;
     }
 
     public String getExplanation() {

@@ -1,5 +1,6 @@
 package com.example.travel_planner.service;
 
+import com.example.travel_planner.api.TotalCostCalculator;
 import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.trip.Location;
 import com.example.travel_planner.domain.trip.StayPreference;

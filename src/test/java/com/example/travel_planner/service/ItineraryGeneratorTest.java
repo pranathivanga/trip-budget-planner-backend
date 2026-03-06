@@ -1,6 +1,6 @@
 package com.example.travel_planner.service;
 
-import com.example.travel_planner.domain.budget.Budget;
+import com.example.travel_planner.service.budget.Budget;
 import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.plan.TripPlan;
 import com.example.travel_planner.domain.trip.Location;
