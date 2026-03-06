@@ -119,6 +119,7 @@ public class TripPlannerController {
         List<String> suggestionMessages =
                 suggestions.stream()
                         .map(Suggestion::getMessage)
+                        .distinct()
                         .collect(Collectors.toList());
 
         return new TripPlannerResponse(

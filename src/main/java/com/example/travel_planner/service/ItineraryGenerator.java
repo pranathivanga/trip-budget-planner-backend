@@ -9,6 +9,7 @@ import com.example.travel_planner.domain.decision.FeasibilityResult;
 import com.example.travel_planner.service.budget.Budget;
 import com.example.travel_planner.config.PlannerConfig;
 import com.example.travel_planner.service.distance.DistanceService;
+import com.example.travel_planner.service.explanation.ExplanationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class ItineraryGenerator {
     private final StayCostCalculator stayCostCalculator = new StayCostCalculator();
     private final FoodCostCalculator foodCostCalculator = new FoodCostCalculator();
     private final BudgetFeasibilityService feasibilityService = new BudgetFeasibilityService();
+    private final ExplanationService explanationService = new ExplanationService();
 
     public List<TripPlan> generatePlans(Trip baseTrip, Budget budget) {
 
@@ -119,10 +121,17 @@ public class ItineraryGenerator {
 
         int finalDays = baseTrip.getNumberOfDays();
 
-        String explanation =
-                "Generated " + type +
-                        " plan using stay preference " + usedPreference +
-                        " for " + finalDays + " days";
+        TripPlan tempPlan = new TripPlan(
+                type,
+                travelCost,
+                stayCost,
+                foodCost,
+                totalCost,
+                result.getBudgetState(),
+                ""
+        );
+
+        String explanation = explanationService.generateExplanation(tempPlan);
 
         TripPlan plan = new TripPlan(
                 type,
