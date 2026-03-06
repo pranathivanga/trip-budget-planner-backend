@@ -6,6 +6,15 @@ public class TripRequest {
     private String destinationCity;
     private int days;
     private int travelers;
+    private String planType;
+
+    public String getPlanType() {
+        return planType;
+    }
+
+    public void setPlanType(String planType) {
+        this.planType = planType;
+    }
 
     public String getSourceCity() {
         return sourceCity;

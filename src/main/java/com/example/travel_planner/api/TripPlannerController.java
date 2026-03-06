@@ -2,6 +2,7 @@ package com.example.travel_planner.api;
 
 import com.example.travel_planner.domain.itinerary.DayPlan;
 import com.example.travel_planner.domain.suggestion.Suggestion;
+import com.example.travel_planner.dto.request.BudgetAdjustRequest;
 import com.example.travel_planner.service.budget.Budget;
 import com.example.travel_planner.service.budget.BudgetAllocator;
 import com.example.travel_planner.domain.plan.TripPlan;
@@ -33,6 +34,30 @@ public class TripPlannerController {
     private final ItineraryService itineraryService = new ItineraryService();
     private final PdfService pdfService = new PdfService();
 
+    @PostMapping("/adjust-budget")
+    public TripPlanResponse adjustBudget(
+            @RequestBody BudgetAdjustRequest request
+    ) {
+
+        double totalBudget = 50000; // example for now
+
+        double travelCost = totalBudget * request.getTravelPercent();
+        double stayCost = totalBudget * request.getStayPercent();
+        double foodCost = totalBudget * request.getFoodPercent();
+
+        double total = travelCost + stayCost + foodCost;
+
+        return new TripPlanResponse(
+                "CUSTOM",
+                travelCost,
+                stayCost,
+                foodCost,
+                total,
+                "CUSTOM",
+                "Custom budget allocation based on your preferences."
+        );
+    }
+
     @PostMapping("/pdf")
     public ResponseEntity<byte[]> downloadPdf(@RequestBody TripRequest request) {
 
@@ -51,10 +76,13 @@ public class TripPlannerController {
                 trip
         );
 
-        List<TripPlan> plans = generator.generatePlans(trip, budget);
+        List<TripPlan> allPlans = generator.generatePlans(trip, budget);
 
-        List<DayPlan> itinerary =
-                itineraryService.generateItinerary(trip);
+        List<TripPlan> plans = allPlans.stream()
+                .filter(p -> p.getPlanType().name().equals(request.getPlanType()))
+                .collect(java.util.stream.Collectors.toList());
+
+        List<DayPlan> itinerary = itineraryService.generateItinerary(trip);
 
         byte[] pdf = pdfService.generatePdf(plans, itinerary);
 
@@ -63,7 +91,6 @@ public class TripPlannerController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
-
     @PostMapping("/itinerary")
     public List<DayPlan> generateItinerary(@RequestBody TripRequest request) {
 
