@@ -13,6 +13,9 @@ public class TripPlanResponse {
     private String budgetState;
 
     private String explanation;
+    private int comfortScore;
+    private int safetyScore;
+    private int experienceScore;
 
     public TripPlanResponse(
             String planType,

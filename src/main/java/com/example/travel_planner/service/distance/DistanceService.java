@@ -24,7 +24,7 @@ public class DistanceService {
 
     @Cacheable("distances")
     public int getDistance(String source, String destination) {
-
+        System.out.println("Distance calculated from source (not cache)");
         double[] src = CITY_COORDINATES.get(source);
         double[] dst = CITY_COORDINATES.get(destination);
 

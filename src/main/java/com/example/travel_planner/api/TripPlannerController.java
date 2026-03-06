@@ -13,6 +13,7 @@ import com.example.travel_planner.service.itinerary.ItineraryService;
 import com.example.travel_planner.service.pdf.PdfService;
 import com.example.travel_planner.service.scoring.PlanScoringService;
 import com.example.travel_planner.service.suggestion.SuggestionService;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,6 @@ public class TripPlannerController {
     private final PlanScoringService scoringService = new PlanScoringService();
     private final ItineraryService itineraryService = new ItineraryService();
     private final PdfService pdfService = new PdfService();
-
 
     @PostMapping("/pdf")
     public ResponseEntity<byte[]> downloadPdf(@RequestBody TripRequest request) {
@@ -97,7 +97,9 @@ public class TripPlannerController {
         );
 
         List<TripPlan> plans = generator.generatePlans(trip, budget);
+
         TripPlan bestPlan = scoringService.chooseBestPlan(plans);
+
         List<Suggestion> suggestions =
                 suggestionService.generateSuggestions(plans);
 
