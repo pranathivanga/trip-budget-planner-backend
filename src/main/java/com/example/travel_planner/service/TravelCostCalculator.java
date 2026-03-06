@@ -22,12 +22,20 @@ public class TravelCostCalculator {
 
         int distance = distanceService.getDistance(source, destination);
 
-        double costPerKm = 5;
+        double costPerKm;
 
-        double travelCost =
-                distance *
-                        costPerKm *
-                        trip.getNumberOfTravelers();
+        switch (trip.getStayPreference()) {
+            case PREMIUM:
+                costPerKm = 10; // flight/cab
+                break;
+            case STANDARD:
+                costPerKm = 6; // train AC
+                break;
+            default:
+                costPerKm = 3; // bus/sleeper
+        }
+
+        double travelCost = distance * costPerKm * trip.getNumberOfTravelers();
 
         return new Money(travelCost, "INR");
     }

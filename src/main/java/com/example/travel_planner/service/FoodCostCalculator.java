@@ -26,10 +26,20 @@ public class FoodCostCalculator {
                 costPerDay = 400;
         }
 
-        double total =
-                costPerDay
-                        * trip.getNumberOfDays()
-                        * trip.getNumberOfTravelers();
+        double multiplier;
+
+        switch (trip.getStayPreference()) {
+            case PREMIUM:
+                multiplier = 1.8; // fine dining
+                break;
+            case STANDARD:
+                multiplier = 1.2; // mix of restaurants
+                break;
+            default:
+                multiplier = 1.0; // street food / budget
+        }
+
+        double total = costPerDay * multiplier * trip.getNumberOfDays() * trip.getNumberOfTravelers();
 
         return new Money(total, "INR");
     }

@@ -82,6 +82,10 @@ public class TripPlannerController {
                 .filter(p -> p.getPlanType().name().equals(request.getPlanType()))
                 .collect(java.util.stream.Collectors.toList());
 
+        System.out.println("Received planType: " + request.getPlanType());
+        System.out.println("All plans count: " + allPlans.size());
+        System.out.println("Filtered plans count: " + plans.size());
+
         List<DayPlan> itinerary = itineraryService.generateItinerary(trip);
 
         byte[] pdf = pdfService.generatePdf(plans, itinerary);
