@@ -12,7 +12,7 @@ public class PlannerConfig {
     private Stay stay = new Stay();
 
     public static class Travel {
-        private double costPerKm;
+        private double costPerKm=8;
 
         public double getCostPerKm() {
             return costPerKm;

@@ -5,6 +5,11 @@ public class BudgetAdjustRequest {
     private double travelPercent;
     private double stayPercent;
     private double foodPercent;
+private double totalBudget;
+
+    public double getTotalBudget() {
+        return totalBudget;
+    }
 
     public double getTravelPercent() {
         return travelPercent;

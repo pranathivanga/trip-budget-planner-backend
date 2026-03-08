@@ -35,14 +35,18 @@ public class TripPlannerController {
     private final ItineraryService itineraryService = new ItineraryService();
     private final PdfService pdfService = new PdfService();
 
+    private double round(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
     @PostMapping("/adjust-budget")
     public TripPlanResponse adjustBudget(@RequestBody BudgetAdjustRequest request) {
 
-        double totalBudget = 50000;
+        double totalBudget = request.getTotalBudget();
 
-        double travelCost = totalBudget * request.getTravelPercent();
-        double stayCost = totalBudget * request.getStayPercent();
-        double foodCost = totalBudget * request.getFoodPercent();
+        double travelCost = totalBudget * (request.getTravelPercent() / 100.0);
+        double stayCost = totalBudget * (request.getStayPercent() / 100.0);
+        double foodCost = totalBudget * (request.getFoodPercent() / 100.0);
 
         double total = travelCost + stayCost + foodCost;
 
@@ -141,10 +145,10 @@ public class TripPlannerController {
                 plans.stream()
                         .map(p -> new TripPlanResponse(
                                 p.getPlanType().name(),
-                                p.getTravelCost().getAmount(),
-                                p.getStayCost().getAmount(),
-                                p.getFoodCost().getAmount(),
-                                p.getTotalCost().getAmount(),
+                                round(p.getTravelCost().getAmount()),
+                                round(p.getStayCost().getAmount()),
+                                round(p.getFoodCost().getAmount()),
+                                round(p.getTotalCost().getAmount()),
                                 p.getBudgetState().name(),
                                 p.getExplanation()
                         ))

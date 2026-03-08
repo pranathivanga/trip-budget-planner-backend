@@ -1,68 +1,38 @@
 package com.example.travel_planner.distance;
 
-import org.springframework.web.client.RestTemplate;
-
+import java.util.HashMap;
 import java.util.Map;
 
 public class DistanceService {
 
-    private static final String GOOGLE_API =
-            "https://maps.googleapis.com/maps/api/distancematrix/json";
+    private static final Map<String, Double> DISTANCES = new HashMap<>();
 
-    private static final String API_KEY = "YOUR_GOOGLE_API_KEY";
+    static {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+        DISTANCES.put("Hyderabad-Bangalore", 570.0);
+        DISTANCES.put("Hyderabad-Goa", 660.0);
+        DISTANCES.put("Hyderabad-Delhi", 1550.0);
 
-    public double getDistanceKm(String source, String destination) {
+        DISTANCES.put("Bangalore-Goa", 560.0);
+        DISTANCES.put("Bangalore-Delhi", 2150.0);
 
-        try {
-
-            String url =
-                    GOOGLE_API
-                            + "?origins=" + source
-                            + "&destinations=" + destination
-                            + "&key=" + API_KEY;
-
-            Map response = restTemplate.getForObject(url, Map.class);
-
-            Map row = (Map) ((java.util.List) response.get("rows")).get(0);
-            Map element = (Map) ((java.util.List) row.get("elements")).get(0);
-            Map distance = (Map) element.get("distance");
-
-            int meters = (int) distance.get("value");
-
-            return meters / 1000.0;
-
-        } catch (Exception e) {
-
-            System.out.println("Google Maps failed, using Haversine fallback");
-
-            return haversineDistance(source, destination);
-        }
+        DISTANCES.put("Delhi-Goa", 1900.0);
     }
 
-    private double haversineDistance(String city1, String city2) {
+    public double getDistance(String from, String to) {
 
-        double lat1 = 17.3850;  // Hyderabad fallback
-        double lon1 = 78.4867;
+        String key = from + "-" + to;
+        String reverseKey = to + "-" + from;
 
-        double lat2 = 15.2993;  // Goa fallback
-        double lon2 = 74.1240;
+        if (DISTANCES.containsKey(key)) {
+            return DISTANCES.get(key);
+        }
 
-        double R = 6371;
+        if (DISTANCES.containsKey(reverseKey)) {
+            return DISTANCES.get(reverseKey);
+        }
 
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-
-        double a =
-                Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                        + Math.cos(Math.toRadians(lat1))
-                        * Math.cos(Math.toRadians(lat2))
-                        * Math.sin(dLon / 2)
-                        * Math.sin(dLon / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        return R * c;
+        // fallback distance if city pair not found
+        return 800;
     }
 }

@@ -17,26 +17,18 @@ public class TravelCostCalculator {
 
     public Money calculate(Trip trip) {
 
-        String source = trip.getSource().getCity();
-        String destination = trip.getDestination().getCity();
+        double distance = distanceService.getDistance(
+                trip.getSource().getCity(),
+                trip.getDestination().getCity()
+        );
 
-       double distance = distanceService.getDistanceKm(source, destination);
+        double costPerKm = config.getTravel().getCostPerKm();
 
-        double costPerKm;
-
-        switch (trip.getStayPreference()) {
-            case PREMIUM:
-                costPerKm = 10; // flight/cab
-                break;
-            case STANDARD:
-                costPerKm = 6; // train AC
-                break;
-            default:
-                costPerKm = 3; // bus/sleeper
-        }
-
-        double travelCost = distance * costPerKm * trip.getNumberOfTravelers();
-
-        return new Money(travelCost, "INR");
+        double total =
+                distance *
+                        costPerKm *
+                        trip.getNumberOfTravelers();
+System.out.println(distance);
+        return new Money(total, "INR");
     }
 }

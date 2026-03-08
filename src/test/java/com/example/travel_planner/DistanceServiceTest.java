@@ -12,7 +12,7 @@ public class DistanceServiceTest {
 
         DistanceService service = new DistanceService();
 
-        double distance = service.getDistanceKm("Hyderabad", "Goa");
+        double distance = service.getDistance("Hyderabad", "Goa");
 
         assertTrue(distance > 0);
     }
