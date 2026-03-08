@@ -1,21 +1,20 @@
 package com.example.travel_planner.api;
 
-import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.itinerary.DayPlan;
 import com.example.travel_planner.domain.suggestion.Suggestion;
 import com.example.travel_planner.dto.request.BudgetAdjustRequest;
 import com.example.travel_planner.exception.TripPlanningException;
-import com.example.travel_planner.service.budget.Budget;
-import com.example.travel_planner.service.budget.BudgetAllocator;
+import com.example.travel_planner.budget.Budget;
+import com.example.travel_planner.budget.BudgetAllocator;
 import com.example.travel_planner.domain.plan.TripPlan;
 import com.example.travel_planner.domain.trip.Location;
 import com.example.travel_planner.domain.trip.StayPreference;
 import com.example.travel_planner.domain.trip.Trip;
-import com.example.travel_planner.service.ItineraryGenerator;
-import com.example.travel_planner.service.itinerary.ItineraryService;
-import com.example.travel_planner.service.pdf.PdfService;
-import com.example.travel_planner.service.scoring.PlanScoringService;
-import com.example.travel_planner.service.suggestion.SuggestionService;
+import com.example.travel_planner.ItineraryGenerator;
+import com.example.travel_planner.itinerary.ItineraryService;
+import com.example.travel_planner.pdf.PdfService;
+import com.example.travel_planner.scoring.PlanScoringService;
+import com.example.travel_planner.suggestion.SuggestionService;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -37,11 +36,9 @@ public class TripPlannerController {
     private final PdfService pdfService = new PdfService();
 
     @PostMapping("/adjust-budget")
-    public TripPlanResponse adjustBudget(
-            @RequestBody BudgetAdjustRequest request
-    ) {
+    public TripPlanResponse adjustBudget(@RequestBody BudgetAdjustRequest request) {
 
-        double totalBudget = 50000; // example for now
+        double totalBudget = 50000;
 
         double travelCost = totalBudget * request.getTravelPercent();
         double stayCost = totalBudget * request.getStayPercent();
@@ -82,11 +79,7 @@ public class TripPlannerController {
 
         List<TripPlan> plans = allPlans.stream()
                 .filter(p -> p.getPlanType().name().equals(request.getPlanType()))
-                .collect(java.util.stream.Collectors.toList());
-
-        System.out.println("Received planType: " + request.getPlanType());
-        System.out.println("All plans count: " + allPlans.size());
-        System.out.println("Filtered plans count: " + plans.size());
+                .collect(Collectors.toList());
 
         List<DayPlan> itinerary = itineraryService.generateItinerary(trip);
 
@@ -97,6 +90,7 @@ public class TripPlannerController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
+
     @PostMapping("/itinerary")
     public List<DayPlan> generateItinerary(@RequestBody TripRequest request) {
 
@@ -113,12 +107,14 @@ public class TripPlannerController {
 
     @PostMapping("/plan")
     public TripPlannerResponse generatePlans(@RequestBody TripRequest request) {
+
         if(request.getTotalBudget() < 1000) {
             throw new TripPlanningException(
                     "Budget too low for this trip",
                     "Increase budget or reduce trip days"
             );
         }
+
         Trip trip = new Trip(
                 new Location(request.getSourceCity()),
                 new Location(request.getDestinationCity()),
@@ -139,7 +135,7 @@ public class TripPlannerController {
         TripPlan bestPlan = scoringService.chooseBestPlan(plans);
 
         List<Suggestion> suggestions =
-                suggestionService.generateSuggestions(plans,request.getTotalBudget());
+                suggestionService.generateSuggestions(plans, request.getTotalBudget());
 
         List<TripPlanResponse> planResponses =
                 plans.stream()
@@ -166,6 +162,7 @@ public class TripPlannerController {
                 bestPlan.getPlanType().name()
         );
     }
+
     @PostMapping("/minimum-budget")
     public MinimumBudgetResponse calculateMinimumBudget(@RequestBody TripRequest request) {
 
@@ -179,23 +176,33 @@ public class TripPlannerController {
 
         BudgetAllocator allocator = new BudgetAllocator();
 
-        Budget dummyBudget =
-                allocator.allocate(1000000, trip); // large number just to compute costs
+        Budget dummyBudget = allocator.allocate(1000000, trip);
 
-        List<TripPlan> plans =
-                generator.generatePlans(trip, dummyBudget);
+        List<TripPlan> plans = generator.generatePlans(trip, dummyBudget);
+
+        TripPlan cheapestPlan = plans.stream()
+                .min((p1, p2) -> Double.compare(
+                        p1.getTotalCost().getAmount(),
+                        p2.getTotalCost().getAmount()
+                ))
+                .orElse(null);
+
+        double travelCost = cheapestPlan.getTravelCost().getAmount();
+        double stayCost = cheapestPlan.getStayCost().getAmount();
+        double foodCost = cheapestPlan.getFoodCost().getAmount();
 
         double minimumCost =
-                plans.stream()
-                        .mapToDouble(p -> p.getTotalCost().getAmount())
-                        .min()
-                        .orElse(0);
-minimumCost=Math.round(minimumCost*100.0)/100.0;
+                travelCost + stayCost + foodCost;
+
+        minimumCost = Math.round(minimumCost * 100.0) / 100.0;
+
         return new MinimumBudgetResponse(
                 minimumCost,
+                travelCost,
+                stayCost,
+                foodCost,
                 request.getDays(),
                 "This trip requires at least ₹" + minimumCost + " to be feasible."
         );
     }
-
 }

@@ -5,9 +5,46 @@ public class MinimumBudgetResponse {
     private double minimumBudget;
     private int recommendedDays;
     private String suggestion;
+private double travelCost;
+private double stayCost;
+private double foodCost;
 
-    public MinimumBudgetResponse(double minimumBudget, int recommendedDays, String suggestion) {
+    public double getTravelCost() {
+        return travelCost;
+    }
+
+    public void setTravelCost(double travelCost) {
+        this.travelCost = travelCost;
+    }
+
+    public double getStayCost() {
+        return stayCost;
+    }
+
+    public void setStayCost(double stayCost) {
+        this.stayCost = stayCost;
+    }
+
+    public double getFoodCost() {
+        return foodCost;
+    }
+
+    public void setFoodCost(double foodCost) {
+        this.foodCost = foodCost;
+    }
+
+    public MinimumBudgetResponse(
+            double minimumBudget,
+            double travelCost,
+            double stayCost,
+            double foodCost,
+            int recommendedDays,
+            String suggestion
+    ) {
         this.minimumBudget = minimumBudget;
+        this.travelCost = travelCost;
+        this.stayCost = stayCost;
+        this.foodCost = foodCost;
         this.recommendedDays = recommendedDays;
         this.suggestion = suggestion;
     }
