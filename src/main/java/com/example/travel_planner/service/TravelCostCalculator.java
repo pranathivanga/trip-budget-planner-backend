@@ -20,7 +20,7 @@ public class TravelCostCalculator {
         String source = trip.getSource().getCity();
         String destination = trip.getDestination().getCity();
 
-        int distance = distanceService.getDistance(source, destination);
+       double distance = distanceService.getDistanceKm(source, destination);
 
         double costPerKm;
 

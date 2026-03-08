@@ -1,5 +1,6 @@
 package com.example.travel_planner.api;
 
+import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.itinerary.DayPlan;
 import com.example.travel_planner.domain.suggestion.Suggestion;
 import com.example.travel_planner.dto.request.BudgetAdjustRequest;
@@ -159,4 +160,39 @@ public class TripPlannerController {
                 bestPlan.getPlanType().name()
         );
     }
+    @PostMapping("/minimum-budget")
+    public MinimumBudgetResponse calculateMinimumBudget(
+            @RequestBody TripRequest request
+    ) {
+
+        Trip trip = new Trip(
+                new Location(request.getSourceCity()),
+                new Location(request.getDestinationCity()),
+                request.getDays(),
+                request.getTravelers(),
+                StayPreference.STANDARD
+        );
+
+        Money travelCost =
+                generator.getTravelCostCalculator().calculate(trip);
+
+        Money stayCost =
+                generator.getStayCostCalculator().calculate(trip);
+
+        Money foodCost =
+                generator.getFoodCostCalculator().calculate(trip);
+
+        double total =
+                travelCost.getAmount()
+                        + stayCost.getAmount()
+                        + foodCost.getAmount();
+
+        return new MinimumBudgetResponse(
+                travelCost.getAmount(),
+                stayCost.getAmount(),
+                foodCost.getAmount(),
+                total
+        );
+    }
+
 }

@@ -157,4 +157,15 @@ public class ItineraryGenerator {
 
         return StayPreference.BUDGET;
     }
+    public TravelCostCalculator getTravelCostCalculator() {
+        return travelCostCalculator;
+    }
+
+    public StayCostCalculator getStayCostCalculator() {
+        return stayCostCalculator;
+    }
+
+    public FoodCostCalculator getFoodCostCalculator() {
+        return foodCostCalculator;
+    }
 }

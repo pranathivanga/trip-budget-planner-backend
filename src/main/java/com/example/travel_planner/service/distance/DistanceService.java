@@ -1,60 +1,68 @@
 package com.example.travel_planner.service.distance;
 
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Map;
 
-@Service
 public class DistanceService {
 
-    @Value("${planner.distance.api.key}")
-    private String apiKey;
+    private static final String GOOGLE_API =
+            "https://maps.googleapis.com/maps/api/distancematrix/json";
+
+    private static final String API_KEY = "YOUR_GOOGLE_API_KEY";
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private static final Map<String, double[]> CITY_COORDINATES = Map.of(
-            "Hyderabad", new double[]{78.4867,17.3850},
-            "Goa", new double[]{73.8567,15.2993},
-            "Bangalore", new double[]{77.5946,12.9716},
-            "Delhi", new double[]{77.1025,28.7041}
-    );
-
-    @Cacheable("distances")
-    public int getDistance(String source, String destination) {
-        System.out.println("Distance calculated from source (not cache)");
-        double[] src = CITY_COORDINATES.get(source);
-        double[] dst = CITY_COORDINATES.get(destination);
-
-        if (src == null || dst == null) {
-            return 800;
-        }
-
-        String url =
-                "https://api.openrouteservice.org/v2/directions/driving-car" +
-                        "?api_key=" + apiKey +
-                        "&start=" + src[0] + "," + src[1] +
-                        "&end=" + dst[0] + "," + dst[1];
+    public double getDistanceKm(String source, String destination) {
 
         try {
 
+            String url =
+                    GOOGLE_API
+                            + "?origins=" + source
+                            + "&destinations=" + destination
+                            + "&key=" + API_KEY;
+
             Map response = restTemplate.getForObject(url, Map.class);
 
-            Map feature = ((java.util.List<Map>)response.get("features")).get(0);
+            Map row = (Map) ((java.util.List) response.get("rows")).get(0);
+            Map element = (Map) ((java.util.List) row.get("elements")).get(0);
+            Map distance = (Map) element.get("distance");
 
-            Map properties = (Map) feature.get("properties");
+            int meters = (int) distance.get("value");
 
-            Map summary = (Map) properties.get("summary");
-
-            double distanceMeters = (double) summary.get("distance");
-
-            return (int)(distanceMeters / 1000);
+            return meters / 1000.0;
 
         } catch (Exception e) {
 
-            return 800;
+            System.out.println("Google Maps failed, using Haversine fallback");
+
+            return haversineDistance(source, destination);
         }
+    }
+
+    private double haversineDistance(String city1, String city2) {
+
+        double lat1 = 17.3850;  // Hyderabad fallback
+        double lon1 = 78.4867;
+
+        double lat2 = 15.2993;  // Goa fallback
+        double lon2 = 74.1240;
+
+        double R = 6371;
+
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        double a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                        + Math.cos(Math.toRadians(lat1))
+                        * Math.cos(Math.toRadians(lat2))
+                        * Math.sin(dLon / 2)
+                        * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
     }
 }
