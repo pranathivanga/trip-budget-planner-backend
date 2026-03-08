@@ -71,7 +71,7 @@ Response → Frontend
 
 Clone the repository
 
-git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME.git
+git clone (https://github.com/pranathivanga/trip-budget-planner-backend.git)
 
 Run backend
 
