@@ -77,10 +77,10 @@ Run backend
 
 mvn spring-boot:run
 
-Backend runs at
+## Live Deployment
 
-http://localhost:8081
+Frontend  
+https://tripwise-frontend.vercel.app
 
-Frontend runs at
-
-http://localhost:3000
+Backend API  
+http://54.226.116.18:8081
