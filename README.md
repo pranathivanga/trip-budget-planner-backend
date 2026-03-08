@@ -35,7 +35,7 @@ Frontend
 - Tailwind CSS
 
 ---
-
+```
 🏗 Architecture
 
 User Interface (React)
@@ -64,36 +64,7 @@ SuggestionService
         │
         ▼
 Response → Frontend
-
----
-
-📡 API Example
-
-Generate Plans
-
-POST "/api/trips/plan"
-
-Example request
-
-{
-  "sourceCity": "Hyderabad",
-  "destinationCity": "Goa",
-  "days": 3,
-  "travelers": 1,
-  "totalBudget": 40000
-}
-
-Example response
-
-{
-  "planType": "BALANCED",
-  "travelCost": 3300,
-  "stayCost": 10800,
-  "foodCost": 2400,
-  "totalCost": 16500,
-  "budgetState": "COMFORTABLE"
-}
-
+```
 ---
 
 ▶ Running the Project
