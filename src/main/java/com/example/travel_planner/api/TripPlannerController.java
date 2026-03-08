@@ -133,7 +133,7 @@ public class TripPlannerController {
         TripPlan bestPlan = scoringService.chooseBestPlan(plans);
 
         List<Suggestion> suggestions =
-                suggestionService.generateSuggestions(plans);
+                suggestionService.generateSuggestions(plans,request.getTotalBudget());
 
         List<TripPlanResponse> planResponses =
                 plans.stream()
