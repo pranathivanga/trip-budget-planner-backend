@@ -4,6 +4,7 @@ import com.example.travel_planner.domain.cost.Money;
 import com.example.travel_planner.domain.itinerary.DayPlan;
 import com.example.travel_planner.domain.suggestion.Suggestion;
 import com.example.travel_planner.dto.request.BudgetAdjustRequest;
+import com.example.travel_planner.exception.TripPlanningException;
 import com.example.travel_planner.service.budget.Budget;
 import com.example.travel_planner.service.budget.BudgetAllocator;
 import com.example.travel_planner.domain.plan.TripPlan;
@@ -112,7 +113,12 @@ public class TripPlannerController {
 
     @PostMapping("/plan")
     public TripPlannerResponse generatePlans(@RequestBody TripRequest request) {
-
+        if(request.getTotalBudget() < 1000) {
+            throw new TripPlanningException(
+                    "Budget too low for this trip",
+                    "Increase budget or reduce trip days"
+            );
+        }
         Trip trip = new Trip(
                 new Location(request.getSourceCity()),
                 new Location(request.getDestinationCity()),
@@ -161,37 +167,34 @@ public class TripPlannerController {
         );
     }
     @PostMapping("/minimum-budget")
-    public MinimumBudgetResponse calculateMinimumBudget(
-            @RequestBody TripRequest request
-    ) {
+    public MinimumBudgetResponse calculateMinimumBudget(@RequestBody TripRequest request) {
 
         Trip trip = new Trip(
                 new Location(request.getSourceCity()),
                 new Location(request.getDestinationCity()),
                 request.getDays(),
                 request.getTravelers(),
-                StayPreference.STANDARD
+                StayPreference.BUDGET
         );
 
-        Money travelCost =
-                generator.getTravelCostCalculator().calculate(trip);
+        BudgetAllocator allocator = new BudgetAllocator();
 
-        Money stayCost =
-                generator.getStayCostCalculator().calculate(trip);
+        Budget dummyBudget =
+                allocator.allocate(1000000, trip); // large number just to compute costs
 
-        Money foodCost =
-                generator.getFoodCostCalculator().calculate(trip);
+        List<TripPlan> plans =
+                generator.generatePlans(trip, dummyBudget);
 
-        double total =
-                travelCost.getAmount()
-                        + stayCost.getAmount()
-                        + foodCost.getAmount();
-
+        double minimumCost =
+                plans.stream()
+                        .mapToDouble(p -> p.getTotalCost().getAmount())
+                        .min()
+                        .orElse(0);
+minimumCost=Math.round(minimumCost*100.0)/100.0;
         return new MinimumBudgetResponse(
-                travelCost.getAmount(),
-                stayCost.getAmount(),
-                foodCost.getAmount(),
-                total
+                minimumCost,
+                request.getDays(),
+                "This trip requires at least ₹" + minimumCost + " to be feasible."
         );
     }
 
