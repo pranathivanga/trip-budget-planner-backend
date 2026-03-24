@@ -77,10 +77,7 @@ Run backend
 
 mvn spring-boot:run
 
-## Live Deployment
+## 🚀 Live Deployment
 
-Frontend  
-https://tripwise-frontend.vercel.app
-
-Backend API  
-http://54.226.116.18:8081
+- 🌐 Frontend: (https://tripwise-frontend.vercel.app)  
+- ⚙️ Backend API: (https://trip-budget-planner-backend-production.up.railway.app)
