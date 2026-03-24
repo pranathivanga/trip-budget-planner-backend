@@ -44,9 +44,20 @@ public class TripPlannerController {
 
         double totalBudget = request.getTotalBudget();
 
-        double travelCost = totalBudget * (request.getTravelPercent() / 100.0);
-        double stayCost = totalBudget * (request.getStayPercent() / 100.0);
-        double foodCost = totalBudget * (request.getFoodPercent() / 100.0);
+        double travelPercent = request.getTravelPercent();
+        double stayPercent = request.getStayPercent();
+        double foodPercent = request.getFoodPercent();
+
+// Handle both cases: 0–1 or 0–100
+        if (travelPercent <= 1 && stayPercent <= 1 && foodPercent <= 1) {
+            travelPercent *= 100;
+            stayPercent *= 100;
+            foodPercent *= 100;
+        }
+
+        double travelCost = totalBudget * (travelPercent / 100.0);
+        double stayCost = totalBudget * (stayPercent / 100.0);
+        double foodCost = totalBudget * (foodPercent / 100.0);
 
         double total = travelCost + stayCost + foodCost;
 
